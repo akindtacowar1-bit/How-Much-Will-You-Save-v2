@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cost of living savings calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+/* Brand settings: change the colours and fonts here to restyle the whole page. */
+:root{
+  --red:#d8282f; --red-deep:#a81c23; --navy:#14223b; --ink:#1b2333; --mute:#566176;
+  --bg:#f5f6f8; --card:#ffffff; --line:#e0e4ea; --field:#f5f6f8; --soft:#fdecec; --good:#0b7a4b;
+  --disp:"Poppins","Segoe UI",system-ui,-apple-system,sans-serif;
+  --body:"Poppins","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body)}
+.hero{position:relative;background:var(--red);color:#fff;padding:calc(44px + env(safe-area-inset-top,0px)) 20px 92px;overflow:hidden}
+.hero::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-1px;height:54px;background:var(--bg);border-radius:50% 50% 0 0 / 100% 100% 0 0}
+.hero-in{max-width:1040px;margin:0 auto}
+.kicker{display:inline-block;font-weight:600;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.18);padding:5px 14px;border-radius:99px;margin-bottom:16px}
+h1{font:700 clamp(2.1rem,6.4vw,3.6rem)/1.08 var(--disp);letter-spacing:-.02em;margin:0 0 14px;max-width:720px}
+h1 em{font-style:italic;font-weight:700}
+.hero p{margin:0;max-width:600px;font-size:1.05rem;opacity:.95}
+.wrap{max-width:1040px;margin:-6px auto 0;padding:10px 18px 110px}
+.grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
+@media(min-width:860px){.grid{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:26px}.sum{position:sticky;top:20px}.bar{display:none!important}}
+section.card,.sum{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 2px 10px rgba(20,34,59,.05)}
+section.card+section.card{margin-top:18px}
+h2{font:700 1.3rem/1.2 var(--disp);margin:0 0 6px;color:var(--navy)}
+h2 em{font-style:italic;color:var(--red)}
+.sub{color:var(--mute);font-size:.9rem;margin:0 0 16px}
+.tag{display:inline-block;font-size:.72rem;font-weight:600;background:var(--soft);color:var(--red-deep);padding:3px 11px;border-radius:99px;margin-left:8px;vertical-align:middle}
+.f{margin:0 0 14px}
+.f>label{display:block;font-weight:600;font-size:.85rem;margin-bottom:5px}
+.hint{color:var(--mute);font-size:.8rem;margin-top:5px}
+input[type=number],input[type=text],select{width:100%;height:46px;border:1.5px solid var(--line);background:var(--field);color:var(--ink);border-radius:12px;padding:0 14px;font:500 1rem var(--body)}
+.money{position:relative}.money span{position:absolute;left:14px;top:11px;color:var(--mute)}.money input{padding-left:28px}
+input[type=range]{width:100%;accent-color:var(--red);height:32px}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--red)}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.item{border:1.5px solid var(--line);border-radius:14px;padding:15px;margin-bottom:12px;background:var(--field)}
+.item .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
+.item .top input[type=text]{height:40px;font:600 .98rem var(--disp);background:var(--card);flex:1;min-width:0}
+.item .top button{border:0;background:none;color:var(--mute);font:600 .82rem var(--body);cursor:pointer;text-decoration:underline;white-space:nowrap}
+.item .sv{margin-top:6px;font-weight:600;color:var(--good);font-size:.88rem}
+.chk{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.88rem;margin:0 0 12px}
+.add{width:100%;height:48px;border:2px solid var(--red);background:#fff;color:var(--red-deep);border-radius:99px;font:600 .95rem var(--body);cursor:pointer}
+.add:hover{background:var(--red);color:#fff}
+.add[disabled]{opacity:.45;cursor:default;background:#fff;color:var(--red-deep)}
+.sum{border-top:6px solid var(--red)}
+.sum h2{margin-bottom:2px}
+.big{font:800 clamp(2.8rem,9vw,4.2rem)/1.05 var(--disp);letter-spacing:-.03em;color:var(--red);margin:6px 0 2px}
+.big small{font:500 1rem var(--body);color:var(--mute);letter-spacing:0;margin-left:6px}
+.brk{margin:18px 0 6px}
+.brk div.r{margin-bottom:14px}
+.brk .t{display:flex;justify-content:space-between;font-weight:600;font-size:.92rem}
+.brk .t span:last-child{font-variant-numeric:tabular-nums}
+.track{height:10px;border-radius:99px;background:var(--field);overflow:hidden;margin-top:6px}
+.track i{display:block;height:100%;background:var(--red);border-radius:99px;width:0;transition:width .35s ease}
+.brk .d{color:var(--mute);font-size:.78rem;margin-top:4px}
+.fine{color:var(--mute);font-size:.78rem;border-top:1px solid var(--line);padding-top:12px;margin-top:8px}
+.fine p{margin:0 0 6px}
+.foot{background:var(--navy);color:#cfd6e4;padding:28px 20px calc(28px + env(safe-area-inset-bottom,0px));font-size:.8rem}
+.foot-in{max-width:1040px;margin:0 auto}
+.foot p{margin:0 0 6px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:3px solid var(--red);padding:10px 18px calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;z-index:5}
+.bar b{font:800 1.6rem var(--disp);color:var(--red)}
+.bar span{color:var(--mute);font-size:.85rem}
+@media(prefers-reduced-motion:reduce){.track i{transition:none}}
+</style>
+</head>
+<body>
+<div class="hero"><div class="hero-in">
+  <span class="kicker">Cost of living</span>
+  <h1>What could Labor’s plan <em>save</em> you?</h1>
+  <p>Add each vehicle and each public transport traveller. We’ll estimate your yearly savings from the $30 toll cap and the $30 fare cap.</p>
+</div></div>
+
+<div class="wrap">
+<div class="grid">
+<main>
+  <section class="card" aria-labelledby="th">
+    <h2 id="th">Toll <em>cap</em><span class="tag">$30 a week per vehicle · 2027</span></h2>
+    <p class="sub">Car, ute, van or motorbike on CityLink, EastLink or the West Gate Tunnel. The cap is worked out for each vehicle separately.</p>
+    <div id="vehs"></div>
+    <button class="add" id="addveh" type="button">Add a vehicle</button>
+    <div class="f" style="margin:16px 0 0"><label for="notices">Paper toll notices you get each year</label><input id="notices" type="number" min="0" max="50" step="1" value="0" inputmode="numeric"><div class="hint">Labor would end the $16 paper admin fee by moving to electronic notices.</div></div>
+  </section>
+
+  <section class="card" aria-labelledby="ph">
+    <h2 id="ph">Public transport <em>cap</em><span class="tag">$30 a week · 2 years</span></h2>
+    <p class="sub">Train, tram and bus. Full fares are capped at $30 a week and concession fares at $15. Under-18s already travel free, so you don’t need to add them.</p>
+    <div id="pers"></div>
+    <button class="add" id="addper" type="button">Add a traveller</button>
+    <div class="hint" style="margin-top:10px">Enter what each person really pays per travel day. At first the cap applies to myki cards only, not tap-on with a bank card.</div>
+  </section>
+
+</main>
+<aside class="sum" aria-live="polite">
+  <h2>Your estimated <em>savings</em></h2>
+  <div class="big"><span id="total">$0</span><small>a year</small></div>
+  <div class="brk">
+    <div class="r"><div class="t"><span>Tolls</span><span id="vt">$0</span></div><div class="track"><i id="bt"></i></div><div class="d" id="dt"></div></div>
+    <div class="r"><div class="t"><span>Public transport</span><span id="vp">$0</span></div><div class="track"><i id="bp"></i></div><div class="d" id="dp"></div></div>  </div>
+  <div class="fine">
+    <p>Unofficial estimate based on published Victorian Labor commitments. These are election promises that depend on Labor being re-elected.</p>
+    <p>The toll cap would run for one year from 1 January 2027 and the fare cap for two years. Savings are yearly figures, using 52 weeks.</p>
+    <p>Each vehicle’s toll rebate is limited to $350 a week and $5,000 a year.</p>
+  </div>
+</aside>
+</div>
+</div>
+
+<div class="foot"><div class="foot-in">
+  <p>This is an unofficial estimator. Figures are estimates based on published Victorian Labor commitments and depend on Labor being re-elected.</p>
+  <!-- AUTHORISATION: if you publish this site, add your own authorisation statement here, for example:
+  <p>Authorised by [Name], [Organisation], [Address].</p> -->
+</div></div>
+
+<div class="bar" aria-hidden="true"><span>Estimated savings a year</span><b id="barTotal">$0</b></div>
+
+<script>
+(function(){
+  var fmt=new Intl.NumberFormat("en-AU",{style:"currency",currency:"AUD",maximumFractionDigits:0});
+  var $=function(id){return document.getElementById(id)};
+  var MAXV=10, MAXP=10;
+  var st={vehs:[{name:"Vehicle 1",days:5,cost:16}],pers:[{name:"Traveller 1",days:5,fare:11.4,conc:false}]};
+  function daysOpts(sel){var s="";for(var n=0;n<=7;n++)s+='<option value="'+n+'"'+(n===sel?' selected':'')+'>'+n+' day'+(n===1?'':'s')+'</option>';return s}
+  function nv(v,max){v=parseFloat(v);if(isNaN(v)||v<0)v=0;return Math.min(v,max)}
+
+  function renderVehs(){
+    var box=$("vehs");box.innerHTML="";
+    st.vehs.forEach(function(v,i){
+      var d=document.createElement("div");d.className="item";
+      d.innerHTML='<div class="top"><input type="text" id="vn'+i+'" maxlength="30" aria-label="Vehicle name" value="'+v.name.replace(/"/g,"&quot;")+'"><button type="button" data-rm>Remove</button></div>'+
+        '<div class="row2"><div class="f"><label for="vd'+i+'">Days a week it pays tolls</label><select id="vd'+i+'">'+daysOpts(v.days)+'</select></div>'+
+        '<div class="f"><label for="vc'+i+'">Tolls paid on those days</label><div class="money"><span>$</span><input id="vc'+i+'" type="number" min="0" max="200" step="0.5" inputmode="decimal" value="'+v.cost+'"></div></div></div>'+
+        '<div class="sv" id="vs'+i+'"></div>';
+      box.appendChild(d);
+      $("vn"+i).addEventListener("input",function(e){v.name=e.target.value;calc()});
+      $("vd"+i).addEventListener("change",function(e){v.days=parseInt(e.target.value,10);calc()});
+      $("vc"+i).addEventListener("input",function(e){v.cost=e.target.value;calc()});
+      d.querySelector("[data-rm]").addEventListener("click",function(){st.vehs.splice(i,1);renderVehs();calc()});
+    });
+    $("addveh").disabled=st.vehs.length>=MAXV;
+  }
+  function renderPers(){
+    var box=$("pers");box.innerHTML="";
+    st.pers.forEach(function(p,i){
+      var d=document.createElement("div");d.className="item";
+      d.innerHTML='<div class="top"><input type="text" id="pn'+i+'" maxlength="30" aria-label="Traveller name" value="'+p.name.replace(/"/g,"&quot;")+'"><button type="button" data-rm>Remove</button></div>'+
+        '<label class="chk"><input type="checkbox" id="pc'+i+'"'+(p.conc?' checked':'')+'> Concession holder ($15 a week cap)</label>'+
+        '<div class="row2"><div class="f"><label for="pd'+i+'">Days a week they travel</label><select id="pd'+i+'">'+daysOpts(p.days)+'</select></div>'+
+        '<div class="f"><label for="pf'+i+'">Fare cost per travel day</label><div class="money"><span>$</span><input id="pf'+i+'" type="number" min="0" max="60" step="0.1" inputmode="decimal" value="'+p.fare+'"></div></div></div>'+
+        '<div class="sv" id="ps'+i+'"></div>';
+      box.appendChild(d);
+      $("pn"+i).addEventListener("input",function(e){p.name=e.target.value;calc()});
+      $("pc"+i).addEventListener("change",function(e){p.conc=e.target.checked;calc()});
+      $("pd"+i).addEventListener("change",function(e){p.days=parseInt(e.target.value,10);calc()});
+      $("pf"+i).addEventListener("input",function(e){p.fare=e.target.value;calc()});
+      d.querySelector("[data-rm]").addEventListener("click",function(){st.pers.splice(i,1);renderPers();calc()});
+    });
+    $("addper").disabled=st.pers.length>=MAXP;
+  }
+
+  function calc(){
+    var toll=0;
+    st.vehs.forEach(function(v,i){
+      var wk=v.days*nv(v.cost,200);
+      var s=Math.min(Math.min(Math.max(wk-30,0),350)*52,5000);
+      toll+=s;
+      $("vs"+i).textContent=fmt.format(wk)+" a week in tolls, capped at $30: saves "+fmt.format(s)+" a year";
+    });
+    var notices=Math.round(nv($("notices").value,50));
+    toll+=notices*16;
+    $("dt").textContent=st.vehs.length+" vehicle"+(st.vehs.length===1?"":"s")+(notices?", plus "+notices+" paper notice"+(notices===1?"":"s")+" at $16":"");
+
+    var pt=0;
+    st.pers.forEach(function(p,i){
+      var wk=p.days*nv(p.fare,60), cap=p.conc?15:30;
+      var s=Math.max(wk-cap,0)*52;
+      pt+=s;
+      $("ps"+i).textContent=fmt.format(wk)+" a week in fares, capped at $"+cap+": saves "+fmt.format(s)+" a year";
+    });
+    $("dp").textContent=st.pers.length+" traveller"+(st.pers.length===1?"":"s");
+
+
+    var total=toll+pt, mx=Math.max(toll,pt,1);
+    $("vt").textContent=fmt.format(toll);$("vp").textContent=fmt.format(pt);
+    $("bt").style.width=(toll/mx*100)+"%";$("bp").style.width=(pt/mx*100)+"%";
+    $("total").textContent=fmt.format(total);$("barTotal").textContent=fmt.format(total);
+  }
+
+  $("addveh").addEventListener("click",function(){if(st.vehs.length<MAXV){st.vehs.push({name:"Vehicle "+(st.vehs.length+1),days:5,cost:16});renderVehs();calc()}});
+  $("addper").addEventListener("click",function(){if(st.pers.length<MAXP){st.pers.push({name:"Traveller "+(st.pers.length+1),days:5,fare:11.4,conc:false});renderPers();calc()}});
+  $("notices").addEventListener("input",calc);
+  renderVehs();renderPers();calc();
+})();
+</script>
+</body>
+</html>
